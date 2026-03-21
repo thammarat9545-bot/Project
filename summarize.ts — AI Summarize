@@ -1,0 +1,74 @@
+import { Router } from "express";
+import OpenAI from "openai";
+import { SummarizeMeetingBody } from "@workspace/api-zod";
+import { requireAuth, AuthenticatedRequest } from "../middlewares/auth.js";
+
+const router = Router();
+
+// OpenAI client ผ่าน Replit AI Integrations (ไม่ต้องใช้ API key ของตัวเอง)
+const openai = new OpenAI({
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+});
+
+// POST /api/summarize — สรุปการประชุมด้วย AI (ต้อง login ก่อน)
+router.post("/summarize", requireAuth, async (req: AuthenticatedRequest, res) => {
+  const parsed = SummarizeMeetingBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "กรุณาใส่ข้อความสำหรับสรุปการประชุม" });
+    return;
+  }
+  const { text } = parsed.data;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-5-mini",
+      messages: [
+        {
+          role: "system",
+          content: `คุณเป็นผู้ช่วยสรุปการประชุมที่เชี่ยวชาญ
+ตอบเป็นภาษาไทยเสมอ และตอบในรูปแบบ JSON เท่านั้น`,
+        },
+        {
+          role: "user",
+          content: `สรุปการประชุมต่อไปนี้เป็น JSON format ที่มี fields:
+- summary (string) = ใจความสำคัญของการประชุมทั้งหมด
+- keyPoints (array) = รายการประเด็นหลักที่พูดถึง
+- actionItems (array) = รายการงานที่ต้องดำเนินการ
+
+บันทึกการประชุม:
+${text}
+
+ตอบเป็น JSON เท่านั้น เช่น:
+{"summary":"...","keyPoints":["..."],"actionItems":["..."]}`,
+        },
+      ],
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      res.status(500).json({ error: "AI ไม่สามารถสรุปได้ กรุณาลองใหม่" });
+      return;
+    }
+
+    let result: { summary: string; keyPoints: string[]; actionItems: string[] };
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON found");
+      result = JSON.parse(jsonMatch[0]);
+    } catch {
+      result = { summary: content, keyPoints: [], actionItems: [] };
+    }
+
+    res.json({
+      summary: result.summary || "",
+      keyPoints: Array.isArray(result.keyPoints) ? result.keyPoints : [],
+      actionItems: Array.isArray(result.actionItems) ? result.actionItems : [],
+    });
+  } catch (err) {
+    req.log.error({ err }, "Summarize error");
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเรียก AI กรุณาลองใหม่" });
+  }
+});
+
+export default router;
