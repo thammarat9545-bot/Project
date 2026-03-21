@@ -1,0 +1,13 @@
+{
+  "name": "ai-meeting-notes-ui",
+  "version": "1.0.0",
+  "description": "AI Meeting Notes UI redesigned from screenshots",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}
