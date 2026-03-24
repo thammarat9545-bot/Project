@@ -1,148 +1,133 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Meeting Notes - Capture Every Detail</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0b0f1a; color: white; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .gradient-bg {
-            background: radial-gradient(circle at top left, #1e293b 0%, #0b0f1a 100%);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Meeting Notes</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #0b0f1a; color: white; }
+.glass-card {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.gradient-bg {
+    background: radial-gradient(circle at top left, #1e293b 0%, #0b0f1a 100%);
+}
+</style>
 </head>
+
 <body class="gradient-bg min-h-screen">
 
-    <div id="login-page" class="flex min-h-screen">
-        <div class="hidden lg:flex flex-col justify-center px-20 w-1/2 relative overflow-hidden">
-            <div class="absolute top-20 left-20 w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center border border-blue-500/30">
-                <i data-lucide="mic" class="text-blue-400"></i>
-            </div>
-            <h1 class="text-6xl font-bold leading-tight mt-8">
-                Capture every <br> <span class="text-white">detail.</span>
-            </h1>
-            <h2 class="text-5xl font-bold text-blue-400 mt-2">
-                Summarize <br> instantly.
-            </h2>
-            <p class="mt-8 text-gray-400 text-lg max-w-md leading-relaxed">
-                Transform your spoken meetings into structured notes, key points, and actionable items in seconds. Powered by advanced AI.
-            </p>
-        </div>
+<!-- LOGIN PAGE -->
+<div id="login-page" class="flex min-h-screen">
+    <div class="w-full flex items-center justify-center bg-[#0d1117] px-8">
+        <div class="w-full max-w-md p-10 rounded-3xl glass-card border-white/10 shadow-2xl">
+            <h2 class="text-3xl font-bold mb-6">Sign in</h2>
 
-        <div class="w-full lg:w-1/2 flex items-center justify-center bg-[#0d1117] px-8">
-            <div class="w-full max-w-md p-10 rounded-3xl glass-card border-white/10 shadow-2xl">
-                <h2 class="text-3xl font-bold mb-2">Sign in</h2>
-                <p class="text-gray-400 mb-8">Enter your details to access your workspace</p>
-                
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                        <input type="text" placeholder="Enter your username" 
-                            class="w-full bg-[#161b22] border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                        <input type="password" placeholder="••••••••" 
-                            class="w-full bg-[#161b22] border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    </div>
-                    
-                    <button onclick="showDashboard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20">
-                        <i data-lucide="log-in" class="w-5 h-5"></i> Sign In
-                    </button>
+            <input type="text" placeholder="Username"
+                class="w-full mb-4 bg-[#161b22] border border-gray-700 rounded-xl py-3 px-4">
 
-                    <p class="text-center text-gray-400 text-sm">
-                        Don't have an account? <a href="#" class="text-blue-400 hover:underline">Create an account</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+            <input type="password" placeholder="Password"
+                class="w-full mb-6 bg-[#161b22] border border-gray-700 rounded-xl py-3 px-4">
 
-    <div id="dashboard" class="hidden flex flex-col min-h-screen">
-        <nav class="flex items-center justify-between px-6 py-4 border-b border-white/10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                    <i data-lucide="mic" class="text-white w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg">AI Meeting Notes</h1>
-                    <p class="text-xs text-gray-400">Welcome back, Thammarats</p>
-                </div>
-            </div>
-            <button onclick="showLogin()" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                <i data-lucide="log-out" class="w-5 h-5"></i> <span class="text-sm">Logout</span>
+            <button onclick="showDashboard()"
+                class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl">
+                เข้าสู่ระบบ
             </button>
-        </nav>
-
-        <main class="flex flex-1 p-6 gap-6">
-            <div class="flex-1 flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2 text-gray-200">
-                        <i data-lucide="file-text" class="text-blue-400 w-5 h-5"></i>
-                        <span class="font-medium">Meeting Transcript</span>
-                    </div>
-                    <button class="text-gray-500 hover:text-red-400 text-sm flex items-center gap-1">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i> Clear All
-                    </button>
-                </div>
-                <div class="flex-1 bg-[#0d1117] border border-white/5 rounded-2xl p-6 relative">
-                    <textarea 
-                        placeholder="Type your notes here or click the microphone to start speaking (Thai language supported)..."
-                        class="w-full h-full bg-transparent border-none resize-none focus:outline-none text-gray-300 leading-relaxed"></textarea>
-                    
-                    <div class="absolute bottom-6 left-6 flex gap-4">
-                        <button class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all text-sm">
-                            <i data-lucide="mic" class="w-4 h-4"></i> อัดเสียง (ไทย)
-                        </button>
-                    </div>
-                    <div class="absolute bottom-6 right-6">
-                        <button class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2.5 rounded-full flex items-center gap-2 transition-all text-sm">
-                            <i data-lucide="send" class="w-4 h-4"></i> สรุปประชุม
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-1/2 flex flex-col">
-                <div class="flex items-center gap-2 mb-4 text-purple-400">
-                    <div class="w-2 h-2 rounded-full bg-purple-400"></div>
-                    <span class="font-medium">AI Summary Results</span>
-                </div>
-                <div class="flex-1 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-center p-10">
-                    <div class="w-16 h-16 bg-gray-800/50 rounded-2xl flex items-center justify-center mb-6">
-                        <i data-lucide="file-text" class="text-gray-500 w-8 h-8"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">No Summary Yet</h3>
-                    <p class="text-gray-500 max-w-xs">
-                        Record your meeting or type notes, then click "สรุปประชุม" to generate AI insights.
-                    </p>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
+</div>
 
-    <script>
-        // Initialize Lucide Icons
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden flex flex-col min-h-screen">
+
+<nav class="flex justify-between p-4 border-b border-white/10">
+    <h1 class="font-bold">AI Meeting Notes</h1>
+    <button onclick="showLogin()">ออกจากระบบ</button>
+</nav>
+
+<main class="flex-1 p-6">
+    <textarea id="noteArea"
+        placeholder="พิมพ์โน้ต หรือกดปุ่มไมค์เพื่อพูด..."
+        class="w-full h-[60vh] p-4 rounded-xl bg-[#0d1117] border border-white/10"></textarea>
+
+    <div class="flex gap-4 mt-4">
+        <button onclick="startListening()" id="micBtn"
+            class="bg-blue-600 px-6 py-3 rounded-xl flex items-center gap-2">
+            <i data-lucide="mic"></i> เริ่มอัดเสียง
+        </button>
+
+        <button onclick="stopListening()"
+            class="bg-red-600 px-6 py-3 rounded-xl flex items-center gap-2">
+            <i data-lucide="mic-off"></i> หยุดอัดเสียง
+        </button>
+    </div>
+</main>
+</div>
+
+<script>
+lucide.createIcons();
+
+function showDashboard(){
+    login-page.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+}
+function showLogin(){
+    dashboard.classList.add('hidden');
+    login-page.classList.remove('hidden');
+}
+
+// ===== Speech To Text =====
+let recognition;
+let isListening = false;
+
+function startListening() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("เบราว์เซอร์ไม่รองรับการอัดเสียง");
+        return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = 'th-TH';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+        isListening = true;
+        micBtn.innerHTML = '🎤 กำลังอัดเสียง...';
+    };
+
+    recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        document.getElementById('noteArea').value += transcript;
+    };
+
+    recognition.onerror = (event) => {
+        alert("เกิดข้อผิดพลาด: " + event.error);
+    };
+
+    recognition.onend = () => {
+        isListening = false;
+        micBtn.innerHTML = '<i data-lucide="mic"></i> เริ่มอัดเสียง';
         lucide.createIcons();
+    };
 
-        // Simple Page Routing Logic
-        function showDashboard() {
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-        }
+    recognition.start();
+}
 
-        function showLogin() {
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('login-page').classList.remove('hidden');
-        }
-    </script>
+function stopListening() {
+    if (recognition && isListening) recognition.stop();
+}
+</script>
+
 </body>
 </html>
