@@ -1,6 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
-import { getAuthToken, setAuthSession } from '@/lib/auth';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getAuthToken, setAuthSession, clearAuthSession } from './auth';
 
+// 1. Custom Error Class สำหรับจัดการ Error จาก API
 export class ApiError extends Error {
   constructor(public message: string, public status?: number) {
     super(message);
@@ -8,66 +9,93 @@ export class ApiError extends Error {
   }
 }
 
-// Helper ส่ง HTTP request พร้อม JWT header อัตโนมัติ
-async function fetchApi<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+// 2. Helper สำหรับยิง Fetch ที่แนบ JWT Token อัตโนมัติ
+async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = getAuthToken();
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const response = await fetch(url, { ...options, headers });
-  if (!response.ok) {
-    let errorMessage = 'An error occurred';
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.error || errorData.message || errorMessage;
-    } catch {
-      errorMessage = await response.text() || errorMessage;
-    }
-    throw new ApiError(errorMessage, response.status);
+  
+  const headers = new Headers(options.headers);
+  headers.set('Content-Type', 'application/json');
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
-  return response.json();
+
+  const response = await fetch(endpoint, { ...options, headers });
+  const data = await response.json();
+
+  if (!response.ok) {
+    // ถ้า Token หมดอายุ (401) ให้เด้งไปหน้า Login
+    if (response.status === 401) {
+      clearAuthSession();
+      window.location.href = '/';
+    }
+    throw new ApiError(data.error || 'Something went wrong', response.status);
+  }
+
+  return data;
 }
 
-export function useLogin() {
-  return useMutation({
-    mutationFn: async (data: { username: string; password: string }) => {
-      const response = await fetchApi<{ token: string; username: string }>('/api/login', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      setAuthSession(response.token, response.username);
-      return response;
-    },
-  });
-}
+// --- Mutations & Queries ---
 
-export function useRegister() {
+/**
+ * Hook สำหรับ Login (ใช้ที่หน้า Sign In)
+ */
+export const useLogin = () => {
   return useMutation({
-    mutationFn: async (data: { username: string; password: string }) => {
-      const response = await fetchApi<{ token: string; username: string }>('/api/register', {
+    mutationFn: async (credentials: { username: string; password: any }) => {
+      return apiFetch('/api/login', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(credentials),
       });
-      setAuthSession(response.token, response.username);
-      return response;
+    },
+    onSuccess: (data) => {
+      // เก็บ Token และ Username ลง LocalStorage
+      setAuthSession(data.token, data.username);
+      // เปลี่ยนหน้าไป Dashboard
+      window.location.href = '/dashboard'; 
     },
   });
-}
+};
 
-export function useSummarize() {
+/**
+ * Hook สำหรับสมัครสมาชิก (Register)
+ */
+export const useRegister = () => {
   return useMutation({
-    mutationFn: async (data: { text: string }) => {
-      return fetchApi<{
-        summary: string;
-        keyPoints: string[];
-        actionItems: string[];
-      }>('/api/summarize', {
+    mutationFn: async (userData: { username: string; password: any }) => {
+      return apiFetch('/api/register', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(userData),
+      });
+    },
+    onSuccess: (data) => {
+      setAuthSession(data.token, data.username);
+      window.location.href = '/dashboard';
+    },
+  });
+};
+
+/**
+ * Hook สำหรับปุ่ม "สรุปประชุม" (Summarize)
+ * ส่ง transcript ไปหา AI และรับผลสรุปกลับมา
+ */
+export const useSummarize = () => {
+  return useMutation({
+    mutationFn: async (content: string) => {
+      return apiFetch('/api/summarize', {
+        method: 'POST',
+        body: JSON.stringify({ content }),
       });
     },
   });
-}
+};
+
+/**
+ * Hook สำหรับดึงข้อมูล Profile หรือตรวจสอบสถานะ Login
+ */
+export const useUserStatus = () => {
+  return useQuery({
+    queryKey: ['user-status'],
+    queryFn: () => apiFetch('/api/me'),
+    retry: false,
+  });
+};
